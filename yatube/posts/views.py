@@ -142,12 +142,12 @@ def profile_follow(request, username):
     """Подписаться на автора"""
     author = get_object_or_404(User, username=username)
     if request.user != author:
-        if not Follow.objects.filter(user=request.user, author=author).exists():
+        if not Follow.objects.filter(
+                user=request.user, author=author).exists():
             Follow.objects.create(user=request.user, author=author)
         return redirect('posts:follow_index')
     else:
         return redirect(reverse('posts:profile', args=[author.username]))
-
 
 
 @login_required

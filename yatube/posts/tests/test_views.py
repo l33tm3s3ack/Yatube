@@ -26,12 +26,12 @@ class PostsPagesTest(TestCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.simple_image = (
-             b'\x47\x49\x46\x38\x39\x61\x02\x00'
-             b'\x01\x00\x80\x00\x00\x00\x00\x00'
-             b'\xFF\xFF\xFF\x21\xF9\x04\x00\x00'
-             b'\x00\x00\x00\x2C\x00\x00\x00\x00'
-             b'\x02\x00\x01\x00\x00\x02\x02\x0C'
-             b'\x0A\x00\x3B')
+            b'\x47\x49\x46\x38\x39\x61\x02\x00'
+            b'\x01\x00\x80\x00\x00\x00\x00\x00'
+            b'\xFF\xFF\xFF\x21\xF9\x04\x00\x00'
+            b'\x00\x00\x00\x2C\x00\x00\x00\x00'
+            b'\x02\x00\x01\x00\x00\x02\x02\x0C'
+            b'\x0A\x00\x3B')
         cls.image = SimpleUploadedFile(name='simple_image.jpg',
                                        content=cls.simple_image,
                                        content_type='image/jpeg')
@@ -196,12 +196,12 @@ class PostsPagesTest(TestCase):
         """Проверяем, что пользователь может
         подписаться на автора и потом отписаться"""
         self.other_client.get(reverse(self.follow_link[0],
-                                   args=self.follow_link[1]))
+                              args=self.follow_link[1]))
         following = Follow.objects.filter(
             user=self.user, author=self.user).exists()
         self.assertTrue(following)
         self.other_client.get(reverse(self.unfollow_link[0],
-                                   args=self.unfollow_link[1]))
+                              args=self.unfollow_link[1]))
         following = Follow.objects.filter(
             user=self.user, author=self.user).exists()
         self.assertFalse(following)
@@ -209,7 +209,7 @@ class PostsPagesTest(TestCase):
     def test_follow_content_sheet(self):
         """Проверяем, что посты приходят в ленту только подписчиков"""
         self.other_client.get(reverse(self.follow_link[0],
-                                   args=self.follow_link[1]))
+                              args=self.follow_link[1]))
         response = self.other_client.get(reverse(self.follow_index[0]))
         content = response.context['page_obj']
         # У этого пользователя должны быть посты, ведь он только что подписался
