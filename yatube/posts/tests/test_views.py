@@ -198,12 +198,12 @@ class PostsPagesTest(TestCase):
         self.other_client.get(reverse(self.follow_link[0],
                               args=self.follow_link[1]))
         following = Follow.objects.filter(
-            user=self.user, author=self.user).exists()
+            user=self.other_user, author=self.user).exists()
         self.assertTrue(following)
         self.other_client.get(reverse(self.unfollow_link[0],
                               args=self.unfollow_link[1]))
         following = Follow.objects.filter(
-            user=self.user, author=self.user).exists()
+            user=self.other_user, author=self.user).exists()
         self.assertFalse(following)
 
     def test_follow_content_sheet(self):
