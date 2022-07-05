@@ -34,26 +34,27 @@ class PostsURLTests(TestCase):
     create_post = ('/create/', 'posts/create_post.html')
     post_edit = ('/posts/1/edit/', 'posts/create_post.html')
     post_comment = ('/posts/1/comment/', 'posts/post_detail.html')
+    create_guest_redirect = ('/create/', '/auth/login/?next=/create/')
+    comment_guest_redirect = ('/posts/1/comment/',
+                              '/auth/login/?next=/posts/1/comment/')
+    edit_redirect = ('/posts/1/edit/', '/posts/1/')
     common_links_info = (main_page,
                          group_list,
                          profile,
                          post_detail,)
-    links_redirect = ((create_post[0], '/auth/login/?next=/create/'),
-                      (post_comment[0], '/auth/login/?next=/posts/1/comment/'),
-                      (post_edit[0], post_detail[0]))
+    links_redirect = (create_guest_redirect,
+                      comment_guest_redirect,
+                      edit_redirect)
     auth_links_info = (common_links_info
                        + (create_post,
                           post_edit,))
     unknown_link = '/i-dont-know-what-im-doing/'
 
     def setUp(self):
-        # Создаем неавторизованный клиент
         self.guest_client = Client()
-        # Создаем авторизованый клиент
         self.user = User.objects.create_user(username='Noname')
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
-        # Создаем автора поста
         self.author = User.objects.get(username='author')
         self.authorized_author = Client()
         self.authorized_author.force_login(self.author)

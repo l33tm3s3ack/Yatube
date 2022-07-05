@@ -40,7 +40,6 @@ class PostsPagesTest(TestCase):
         cls.other_user = User.objects.create_user(username='test_dude')
 
         GROUPAMOUNT = 2
-        # Создаем две группы для проверки включения постов в группы
         for i in range(GROUPAMOUNT):
             Group.objects.create(
                 title=f'test group {i}',
@@ -49,7 +48,6 @@ class PostsPagesTest(TestCase):
             )
         cls.main_group = Group.objects.get(title='test group 0')
         cls.backup_group = Group.objects.get(title='test group 1')
-        # Создаем посты для теста пажинатора и отображения страниц.
         for i in range(cls.POSTAMOUNT):
             Post.objects.create(
                 id=i,
@@ -147,15 +145,17 @@ class PostsPagesTest(TestCase):
 
     def test_context_in_post_detail(self):
         """Проверка контекста в подробной информации о постах"""
+        link, argument, *_ = self.post_detail
         response = self.authorized_client.get(
-            reverse(self.post_detail[0], args=self.post_detail[1]))
+            reverse(link, args=argument))
         object = response.context['post']
         self.check_fields(object, self.post_for_edit)
 
     def test_group_obj_in_group_list(self):
         """Проверяем контескт групп в списке групп"""
+        link, argument, *_ = self.group_list
         response = self.authorized_client.get(
-            reverse(self.group_list[0], args=self.group_list[1]))
+            reverse(link, args=argument))
         object = response.context['group']
         self.assertEqual(object.title, self.main_group.title)
         self.assertEqual(object.description, self.main_group.description)
@@ -181,39 +181,46 @@ class PostsPagesTest(TestCase):
 
     def test_cache_data(self):
         """Проверяем сохранение данных в кэше"""
+        link, *_ = self.main_page
         cache_page = self.authorized_client.get(
-            reverse(self.main_page[0])).content
+            reverse(link)).content
         self.post_for_edit.delete()
+
         new_entry = self.authorized_client.get(
-            reverse(self.main_page[0])).content
+            reverse(link)).content
         self.assertEqual(new_entry, cache_page)
+
         cache.clear()
         another_entry = self.authorized_client.get(
-            reverse(self.main_page[0])).content
+            reverse(link)).content
         self.assertNotEqual(another_entry, cache_page)
 
     def test_follow_user(self):
         """Проверяем, что пользователь может
         подписаться на автора и потом отписаться"""
-        self.other_client.get(reverse(self.follow_link[0],
-                              args=self.follow_link[1]))
+        link, argument, *_ = self.follow_link
+        self.other_client.get(reverse(link,
+                              args=argument))
         following = Follow.objects.filter(
             user=self.other_user, author=self.user).exists()
         self.assertTrue(following)
-        self.other_client.get(reverse(self.unfollow_link[0],
-                              args=self.unfollow_link[1]))
+        link, argument, *_ = self.unfollow_link
+        self.other_client.get(reverse(link,
+                              args=argument))
         following = Follow.objects.filter(
             user=self.other_user, author=self.user).exists()
         self.assertFalse(following)
 
     def test_follow_content_sheet(self):
         """Проверяем, что посты приходят в ленту только подписчиков"""
-        self.other_client.get(reverse(self.follow_link[0],
-                              args=self.follow_link[1]))
-        response = self.other_client.get(reverse(self.follow_index[0]))
+        link, argument, *_ = self.follow_link
+        self.other_client.get(reverse(link,
+                              args=argument))
+        link, *_ = self.follow_index
+        response = self.other_client.get(reverse(link))
         content = response.context['page_obj']
         # У этого пользователя должны быть посты, ведь он только что подписался
         self.assertNotEqual(len(content), 0)
-        new_entry = self.authorized_client.get(reverse(self.follow_index[0]))
+        new_entry = self.authorized_client.get(reverse(link))
         content = new_entry.context['page_obj']
         self.assertEqual(len(content), 0)

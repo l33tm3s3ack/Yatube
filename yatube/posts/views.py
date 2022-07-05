@@ -37,12 +37,9 @@ def profile(request, username):
     template = 'posts/profile.html'
     posts = profile_user.posts.all()
     post_count = posts.count()
-    if request.user.is_authenticated:
-        if Follow.objects.filter(
-                user=request.user, author=profile_user).exists():
-            following = True
-        else:
-            following = False
+    if request.user.is_authenticated and Follow.objects.filter(
+            user=request.user, author=profile_user).exists():
+        following = True
     else:
         following = False
     context = {
@@ -146,8 +143,7 @@ def profile_follow(request, username):
                 user=request.user, author=author).exists():
             Follow.objects.create(user=request.user, author=author)
         return redirect('posts:follow_index')
-    else:
-        return redirect(reverse('posts:profile', args=[author.username]))
+    return redirect(reverse('posts:profile', args=[author.username]))
 
 
 @login_required

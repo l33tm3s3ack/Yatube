@@ -20,6 +20,20 @@ class PostFormTests (TestCase):
     def setUpClass(cls) -> None:
         super().setUpClass()
         cls.user = User.objects.create_user(username='author')
+        cls.simple_image = (
+            b'\x47\x49\x46\x38\x39\x61\x02\x00'
+            b'\x01\x00\x80\x00\x00\x00\x00\x00'
+            b'\xFF\xFF\xFF\x21\xF9\x04\x00\x00'
+            b'\x00\x00\x00\x2C\x00\x00\x00\x00'
+            b'\x02\x00\x01\x00\x00\x02\x02\x0C'
+            b'\x0A\x00\x3B'
+        )
+        cls.image = SimpleUploadedFile(name='simple_image.jpg',
+                                       content=cls.simple_image,
+                                       content_type='image/jpeg')
+        cls.image_2 = SimpleUploadedFile(name='simple_image_2.jpg',
+                                         content=cls.simple_image,
+                                         content_type='image/jpeg')
         cls.post = Post.objects.create(
             text='test post',
             author=User.objects.get(username='author'),
@@ -36,17 +50,6 @@ class PostFormTests (TestCase):
             kwargs={'username': cls.user.username})
         cls.link_edit_redirect = reverse('posts:post_edit',
                                          kwargs={'post_id': cls.post.id})
-        cls.simple_image = (
-            b'\x47\x49\x46\x38\x39\x61\x02\x00'
-            b'\x01\x00\x80\x00\x00\x00\x00\x00'
-            b'\xFF\xFF\xFF\x21\xF9\x04\x00\x00'
-            b'\x00\x00\x00\x2C\x00\x00\x00\x00'
-            b'\x02\x00\x01\x00\x00\x02\x02\x0C'
-            b'\x0A\x00\x3B'
-        )
-        cls.image = SimpleUploadedFile(name='simple_image.jpg',
-                                       content=cls.simple_image,
-                                       content_type='image/jpeg')
 
     @classmethod
     def tearDownClass(cls) -> None:
@@ -62,6 +65,7 @@ class PostFormTests (TestCase):
         self.assertEqual(post.text, form['text'])
         self.assertEqual(post.author, self.user)
         self.assertEqual(post.group.id, form['group'])
+        self.assertIn(form['image'].name, post.image.name)
 
     def test_create_post(self):
         """Проверяем, что можно создать пост"""
@@ -75,12 +79,13 @@ class PostFormTests (TestCase):
         self.assertRedirects(response, self.link_create_redirect)
         self.assertEqual(Post.objects.count(), post_count + 1)
         self.check_fields(created_post, form_data)
-        self.assertIsNotNone(created_post.image)
+        self.assertIn(self.image.name, created_post.image.name)
 
     def test_edit_post(self):
         """Проверяем, что можно отредактировать пост"""
         form_data = {'text': 'Пост отредактирован',
-                     'group': self.assigned_group.id}
+                     'group': self.assigned_group.id,
+                     'image': self.image_2}
         self.authorized_client.post(self.link_edit_redirect,
                                     form_data)
         redacted_post = Post.objects.get(id=self.post.id)
