@@ -219,7 +219,6 @@ class PostsPagesTest(TestCase):
         link, *_ = self.follow_index
         response = self.other_client.get(reverse(link))
         content = response.context['page_obj']
-        # У этого пользователя должны быть посты, ведь он только что подписался
         self.assertNotEqual(len(content), 0)
         new_entry = self.authorized_client.get(reverse(link))
         content = new_entry.context['page_obj']
