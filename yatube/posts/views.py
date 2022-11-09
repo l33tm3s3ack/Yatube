@@ -38,7 +38,7 @@ def profile(request, username):
     posts = profile_user.posts.all()
     post_count = posts.count()
     if request.user.is_authenticated and Follow.objects.filter(
-            user=request.user, author=profile_user).exists():
+            user=request.user, following=profile_user).exists():
         following = True
     else:
         following = False
@@ -128,7 +128,7 @@ def add_comment(request, post_id):
 @login_required
 def follow_index(request):
     """Просмотр записей, на которых подписан пользователь"""
-    author_list = Follow.objects.filter(user=request.user).values('author')
+    author_list = Follow.objects.filter(user=request.user).values('following')
     posts = Post.objects.filter(author__in=author_list)
     context = {'page_obj': post_listing(posts, request), }
     return render(request, 'posts/follow.html', context)
@@ -139,9 +139,9 @@ def profile_follow(request, username):
     """Подписаться на автора"""
     author = get_object_or_404(User, username=username)
     if request.user != author and not Follow.objects.filter(user=request.user,
-                                                            author=author
+                                                            following=author
                                                             ).exists():
-        Follow.objects.create(user=request.user, author=author)
+        Follow.objects.create(user=request.user, following=author)
         return redirect('posts:follow_index')
     return redirect(reverse('posts:profile', args=[author.username]))
 
@@ -150,6 +150,6 @@ def profile_follow(request, username):
 def profile_unfollow(request, username):
     """Перестать читать автора"""
     author = User.objects.get(username=username)
-    if Follow.objects.filter(user=request.user, author=author).exists():
-        Follow.objects.filter(user=request.user, author=author).delete()
+    if Follow.objects.filter(user=request.user, following=author).exists():
+        Follow.objects.filter(user=request.user, following=author).delete()
     return redirect('posts:main_page')
