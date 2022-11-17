@@ -1,3 +1,60 @@
-# hw05_final
+# Yatube Project
 
-[![CI](https://github.com/yandex-praktikum/hw05_final/actions/workflows/python-app.yml/badge.svg?branch=master)](https://github.com/yandex-praktikum/hw05_final/actions/workflows/python-app.yml)
+
+## Описание
+Проект представляет собой сайт для публикации постов, с возможностью создания групп для сообщений, комментирования, просмотров сообщений различных авторов и подписки на них.
+
+
+## Технологии:
+- Python
+- Django
+- DRF
+- JWT
+- Djoser
+
+
+## Ресурсы API YaMDB
+
+### 1)users:
+Пользователи.
+### 2)posts:
+Публикации
+### 3)groups: 
+Группы, в которые можно включать публикации. 
+### 4)follow: 
+Подписки на различных пользователей для чтения их публикаций
+### 7)comments: 
+Комментарии к публикациям. Комментарий привязан к определённому отзыву.
+
+## Установка
+
+### 1)Клонировать репозиторий и перейти в него в командной строке:
+git clone https://github.com/yandex-praktikum/api_yamdb.git
+cd api_api_yamdb
+
+### 2)Cоздать и активировать виртуальное окружение:
+```
+python -m venv env
+```
+```
+source venv/bin/activate
+```
+### 3)Установить зависимости из файла requirements.txt:
+```
+python -m pip install --upgrade pip
+```
+```
+pip install -r requirements.txt
+```
+### 4)Выполнить миграции:
+```
+python manage.py migrate
+```
+### 5)Запустить проект:
+```
+python manage.py runserver
+```
+
+### Автор проекта: Каряев Андрей
+#### Проект находится на стадии разработка. 
+####
